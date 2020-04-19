@@ -13,7 +13,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpRequest
 from django.test import override_settings, TestCase, TransactionTestCase
 from django.test.client import RequestFactory
-from django.utils.six import iteritems
+from six import iteritems
 
 from django_warrant.backend import CognitoBackend, CognitoUser
 from django_warrant.middleware import APIKeyMiddleware
