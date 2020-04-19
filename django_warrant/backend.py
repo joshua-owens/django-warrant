@@ -6,11 +6,12 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
 from six import iteritems
 
 from warrant import Cognito
+from warrant.exceptions import ForceChangePasswordException
 from .utils import cognito_to_dict
-
 
 class CognitoUser(Cognito):
     user_class = get_user_model()
@@ -74,9 +75,14 @@ class AbstractCognitoBackend(ModelBackend):
             username=username)
         try:
             cognito_user.authenticate(password)
+
+        except ForceChangePasswordException:
+            # TODO handle this properly
+            cognito_user.new_password_challenge(password, password)
         except (Boto3Error, ClientError) as e:
             return self.handle_error_response(e)
         user = cognito_user.get_user()
+
         if user:
             user.access_token = cognito_user.access_token
             user.id_token = cognito_user.id_token
@@ -102,6 +108,7 @@ class CognitoBackend(AbstractCognitoBackend):
         """
         user = super(CognitoBackend, self).authenticate(
             username=username, password=password)
+
         if user:
             request.session['ACCESS_TOKEN'] = user.access_token
             request.session['ID_TOKEN'] = user.id_token
