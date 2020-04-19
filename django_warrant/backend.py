@@ -68,6 +68,7 @@ class AbstractCognitoBackend(ModelBackend):
         cognito_user = CognitoUser(
             settings.COGNITO_USER_POOL_ID,
             settings.COGNITO_APP_ID,
+            settings.COGNTIO_REGION,
             access_key=getattr(settings, 'AWS_ACCESS_KEY_ID', None),
             secret_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', None),
             username=username)
